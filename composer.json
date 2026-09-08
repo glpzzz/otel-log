@@ -1,0 +1,40 @@
+{
+    "name": "glpzzz/otel-log",
+    "description": "OpenTelemetry-aligned single-line JSON (NDJSON) log formatting for yiisoft/log, with request-trace propagation, for shipping into OpenObserve.",
+    "type": "library",
+    "keywords": ["log", "logging", "json", "ndjson", "opentelemetry", "otel", "observability", "openobserve", "yiisoft-log", "tracing"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gabriel A. López López",
+            "email": "glpz@daxslab.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/log": "^3.0",
+        "yiisoft/log": "^2.2"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^11.5",
+        "yiisoft/log-target-file": "^3.1"
+    },
+    "suggest": {
+        "yiisoft/log-target-file": "The file log target these formatters are designed to be attached to via ->setFormat()."
+    },
+    "autoload": {
+        "psr-4": {
+            "Glpzzz\\OtelLog\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Glpzzz\\OtelLog\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "sort-packages": true
+    }
+}
