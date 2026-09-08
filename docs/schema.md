@@ -32,7 +32,8 @@ One JSON object per line. Dot-notation keys are **literal, not nested** — only
 Rejected (`WARN`): `method`, `malformed`, `honeypot`, `csrf`, `validation`.
 Failed (`ERROR`): `mail`, `exception`.
 
-See `Glpzzz\OtelLog\Reason`.
+See the `Glpzzz\OtelLog\Reason` enum — `Reason::from($kind)` and
+`Reason::Validation->level()`.
 
 ## Sample lines
 

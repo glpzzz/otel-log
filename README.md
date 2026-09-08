@@ -64,19 +64,19 @@ use Glpzzz\OtelLog\Reason;
 $log = new SubmissionLog($logger);
 
 // wrong method
-$log->rejected($formName, Reason::METHOD, []);
+$log->rejected($formName, Reason::Method, []);
 
 // honeypot tripped
-$log->rejected($formName, Reason::HONEYPOT, $fields);
+$log->rejected($formName, Reason::Honeypot, $fields);
 
 // hydration / validation threw
-$log->failed($formName, Reason::EXCEPTION, $fields, $e);
+$log->failed($formName, Reason::Exception, $fields, $e);
 
 // form invalid
-$log->rejected($formName, Reason::VALIDATION, $fields, $result->getErrorMessagesIndexedByProperty());
+$log->rejected($formName, Reason::Validation, $fields, $result->getErrorMessagesIndexedByProperty());
 
 // mailer threw
-$log->failed($formName, Reason::MAIL, $fields, $e);
+$log->failed($formName, Reason::Mail, $fields, $e);
 
 // email sent
 $log->sent($formName, $fields);

@@ -15,9 +15,9 @@ use Yiisoft\Log\Logger;
  *
  * - {@see sent()}     — INFO  — the email went out
  * - {@see rejected()} — WARN  — the submission was turned away
- *   ({@see Reason} `method` / `malformed` / `honeypot` / `csrf` / `validation`)
+ *   ({@see Reason} `Method` / `Malformed` / `Honeypot` / `Csrf` / `Validation`)
  * - {@see failed()}   — ERROR — a runtime fault while handling it
- *   ({@see Reason} `mail` / `exception`)
+ *   ({@see Reason} `Mail` / `Exception`)
  *
  * Every site calls the same three verbs, so the level mapping, the `message`
  * text and the `context` shape cannot drift between them.
@@ -33,25 +33,23 @@ final class SubmissionLog
      */
     public function sent(string $form, array $fields): void
     {
-        $this->write(LogLevel::INFO, 'sent', $form, '', $fields, null, null);
+        $this->write(LogLevel::INFO, 'sent', $form, null, $fields, null, null);
     }
 
     /**
-     * @param string                           $reason one of the `rejected` {@see Reason} constants
      * @param array<string, mixed>              $fields the submitted form fields
      * @param array<string, list<string>>|null  $errors validation messages by property, when
-     *                                                  `$reason` is {@see Reason::VALIDATION}
+     *                                                  `$reason` is {@see Reason::Validation}
      */
-    public function rejected(string $form, string $reason, array $fields, ?array $errors = null): void
+    public function rejected(string $form, Reason $reason, array $fields, ?array $errors = null): void
     {
         $this->write(LogLevel::WARNING, 'rejected', $form, $reason, $fields, $errors, null);
     }
 
     /**
-     * @param string               $reason one of the `failed` {@see Reason} constants
-     * @param array<string, mixed>  $fields the submitted form fields
+     * @param array<string, mixed> $fields the submitted form fields
      */
-    public function failed(string $form, string $reason, array $fields, Throwable $error): void
+    public function failed(string $form, Reason $reason, array $fields, Throwable $error): void
     {
         $this->write(LogLevel::ERROR, 'failed', $form, $reason, $fields, null, $error);
     }
@@ -64,14 +62,14 @@ final class SubmissionLog
         string $level,
         string $outcome,
         string $form,
-        string $reason,
+        ?Reason $reason,
         array $fields,
         ?array $errors,
         ?Throwable $error,
     ): void {
         $this->logger->log($level, "{$form} submission {$outcome}", [
             'form' => $form,
-            'reason' => $reason,
+            'reason' => $reason === null ? '' : $reason->value,
             'fields' => $fields,
             'errors' => $errors,
             'errorMessage' => $error?->getMessage(),
