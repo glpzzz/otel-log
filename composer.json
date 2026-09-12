@@ -1,6 +1,6 @@
 {
     "name": "glpzzz/otel-log",
-    "description": "OpenTelemetry-aligned single-line JSON (NDJSON) log formatting for yiisoft/log, with request-trace propagation, for shipping into OpenObserve.",
+    "description": "ECS-aligned single-line JSON (NDJSON) log formatting for yiisoft/log, with request-trace propagation, for shipping into OpenObserve.",
     "type": "library",
     "keywords": ["log", "logging", "json", "ndjson", "opentelemetry", "otel", "observability", "openobserve", "yiisoft-log", "tracing"],
     "license": "MIT",

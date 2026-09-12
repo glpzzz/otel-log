@@ -57,8 +57,13 @@ final class OtelFormatterTest extends TestCase
         self::assertSame('ContactForm submission rejected', $o['message']);
         self::assertSame('ContactForm', $o['context']['form']);
         self::assertArrayNotHasKey('reason', $o['context'], 'reason lives in error.kind, not context');
-        self::assertSame('***', $o['context']['fields']['captcha']);
-        self::assertSame(['name' => ['Name cannot be blank.']], $o['context']['errors']);
+
+        // The submitted body and validation errors are key-attacker-controlled, so they are
+        // json_encode()d strings, never nested objects with submitted field names as keys.
+        $body = json_decode($o['http.request.body.content'], true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame('***', $body['captcha']);
+        $errors = json_decode($o['context']['errors'], true, flags: JSON_THROW_ON_ERROR);
+        self::assertSame(['name' => ['Name cannot be blank.']], $errors);
         self::assertArrayNotHasKey('error.message', $o);
         self::assertMatchesRegularExpression('/^[0-9A-Za-z._-]{8,128}$/', $o['trace.id']);
     }
@@ -94,6 +99,32 @@ final class OtelFormatterTest extends TestCase
         self::assertArrayNotHasKey('error.message', $o);
     }
 
+    public function testAccountIdIsNotEmitted(): void
+    {
+        $o = $this->line(['form' => 'QuoteForm', 'fields' => []], 'info', 'x');
+
+        self::assertArrayNotHasKey('account.id', $o);
+    }
+
+    public function testRequestUrlIsSplitAtTopLevel(): void
+    {
+        $_SERVER['HTTPS'] = 'on';
+        $_SERVER['HTTP_HOST'] = 'example.com';
+        $_SERVER['REQUEST_URI'] = '/contact?utm=abc';
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0';
+        $_SERVER['HTTP_REFERER'] = 'https://example.com/quote';
+
+        $o = $this->line(['form' => 'QuoteForm', 'fields' => []], 'info', 'x');
+
+        self::assertSame('https://example.com/contact?utm=abc', $o['url.full']);
+        self::assertSame('/contact', $o['url.path']);
+        self::assertSame('utm=abc', $o['url.query']);
+        self::assertSame('Mozilla/5.0', $o['user_agent.original']);
+        self::assertSame('https://example.com/quote', $o['http.request.referrer']);
+
+        unset($_SERVER['HTTPS'], $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'], $_SERVER['HTTP_USER_AGENT'], $_SERVER['HTTP_REFERER']);
+    }
+
     public function testServiceNameFromEnv(): void
     {
         putenv('SERVICE_NAME=from-env');
@@ -110,6 +141,6 @@ final class OtelFormatterTest extends TestCase
         self::assertSame('just a message', $o['message']);
         self::assertNull($o['error.kind']);
         self::assertArrayNotHasKey('form', $o['context']);
-        self::assertSame([], $o['context']['fields']);
+        self::assertArrayNotHasKey('http.request.body.content', $o, 'no fields submitted, nothing to encode');
     }
 }
